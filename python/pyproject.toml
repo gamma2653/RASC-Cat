@@ -1,0 +1,38 @@
+[project]
+name = "rasc_cat"
+version = "0.1.0"
+description = "The onboard system for the robotic anxiety support cat."
+authors = [
+    {name = "Christopher De Jesus", email="cd525@cornell.edu"},
+    {name = "Corbin Stickley", email = "cds244@cornell.edu"},
+    {name = "Taylor Edwards", email = "tee22@cornell.edu"},
+    {name = "Kassandra Nguyen", email = "kn396@cornell.edu"},
+    {name = "Alyssa Jarvis", email = "amj99@cornell.edu"}
+]
+license = {file = "LICENSE.txt"}
+readme = "README.md"
+requires-python = ">=3.8"
+
+keywords = ["robot", "anxiety", "support", "cat"]
+
+classifiers = [
+    "Topic :: Software Development"
+]
+
+# Requirements: This is done differently by poetry!
+dependencies = [
+    
+]
+
+[project.optional-dependencies]
+dev = [
+    
+]
+
+[project.urls]
+homepage = "https://github.com/gamma2653/RASC-Cat/"
+documentation = "https://github.com/gamma2653/RASC-Cat/"
+repository = "https://github.com/gamma2653/RASC-Cat/"
+
+[project.scripts]
+poetry = "infer_pyproject.cli:main"
