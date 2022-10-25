@@ -1,0 +1,4 @@
+Don't worry, I'm just going ahead and doing a cpp implementation of the scheduler/sensor read-ins etc.
+The idea is to have python modules for different functionality to be popped in, including python scripts.
+You can go on ahead with the python implementation- if we go with the cpp scheduler (if I can get it to compile)
+we can see some good speed-ups. I also was instead considering a rust implementation, but I may go for that later.
