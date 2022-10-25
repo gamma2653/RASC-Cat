@@ -1,6 +1,5 @@
 # TODO: Reimplement in C++ or Rust(preferred)
 
-from cmath import log
 from typing import Protocol, Iterable, Any, MutableSequence
 from abc import abstractmethod
 import logging
@@ -27,7 +26,7 @@ class Module(Protocol):
         pass
 
 
-class Scheduler: # Note: Not a real scheduler, but needed a controller.
+class System: # Note: Not a real scheduler, but needed a controller.
     
     modules: MutableSequence[Module] = []
 
