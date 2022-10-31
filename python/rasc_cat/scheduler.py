@@ -1,34 +1,20 @@
 # TODO: Reimplement in C++ or Rust(preferred)
 
-from typing import Protocol, Iterable, Any, MutableSequence
-from abc import abstractmethod
+import pathlib
+from collections import namedtuple
+from typing import Iterable, Any, MutableSequence
 import logging
+import subprocess
 
 
 PROJECT_NAME = 'RASC_CAT'
 
+ModuleData = namedtuple('ModuleData', ('name', 'path'))
+# Typing: (str, pathlib.Path)
 
-class Module(Protocol):
-    """
-    Contains the methods: `start`, `stop`, and `run` method.
-    """
-
-    @abstractmethod
-    def start(self):
-        pass
-
-    @abstractmethod
-    def stop(self):
-        pass
-
-    @abstractmethod
-    def run(self):
-        pass
-
-
-class System: # Note: Not a real scheduler, but needed a controller.
+class System: # Note: Not a real scheduler, but needed a python based controller for testing.
     
-    modules: MutableSequence[Module] = []
+    modules: MutableSequence[ModuleData] = []
 
     def __init__(self, name=PROJECT_NAME, log_level = logging.INFO, log_file='./output.log'):
 
@@ -50,11 +36,12 @@ class System: # Note: Not a real scheduler, but needed a controller.
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
 
-    def add_module(self, module: Module, args: Iterable[Any] = (), kwargs: Iterable[Any] = ()):
+    def add_module(self, module: ModuleData, args: Iterable[Any] = (), kwargs: Iterable[Any] = ()):
         self.modules.append(module, args, kwargs)
 
     def start(self):
         for module, args, kwargs in self.modules:
+            subprocess.run()
             module.start(*args, **kwargs)
         
     def stop(self):
