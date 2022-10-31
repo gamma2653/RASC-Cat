@@ -1,16 +1,25 @@
 # TODO: Reimplement in C++ or Rust(preferred)
 
-import pathlib
 from collections import namedtuple
 from typing import Iterable, Any, MutableSequence
 import logging
 import subprocess
-
+from enum import Enum, auto as enum_auto
+import os
 
 PROJECT_NAME = 'RASC_CAT'
 
-ModuleData = namedtuple('ModuleData', ('name', 'path'))
-# Typing: (str, pathlib.Path)
+class ModuleType(Enum):
+    MODULE = enum_auto()
+    START_SCRIPT = enum_auto()
+
+class EnvType(Enum):
+    ISOLATED = enum_auto()
+    SYSTEM = enum_auto()
+    CURRENT = enum_auto()
+
+ModuleData = namedtuple('ModuleData', ('name', 'path', 'env_type', 'mod_type', 'args', 'kwargs'))
+# Typing: (str, Optional[pathlib.Path], ModuleType, Iterable[Any], Iterable[Any])
 
 class System: # Note: Not a real scheduler, but needed a python based controller for testing.
     
@@ -40,9 +49,16 @@ class System: # Note: Not a real scheduler, but needed a python based controller
         self.modules.append(module, args, kwargs)
 
     def start(self):
-        for module, args, kwargs in self.modules:
-            subprocess.run()
-            module.start(*args, **kwargs)
+        for mod_name, path, env_type, mod_type, args, kwargs in self.modules:
+            windows_cmd = f'source {os.path.join(path, "venv", "bin", "activate")}'
+            posix_cmd = f'call {os.path.join(path, "venv", "Scripts", "activate")}'
+            env_activate_cmd = windows_cmd if os.name == 'nt' else posix_cmd
+            start_cmd = f'python -m {mod_name}' if env_type is ModuleType.MODULE else f'python {os.path.join(path, f"{mod_name}.py")}'
+            # Technically could also be 'java', but I will assume we're not running w/ Jython. :)
+            subprocess.run(
+                f'''{env_activate_cmd}
+                python -m {mod_name}''' 
+            )
         
     def stop(self):
         for module, _, _ in self.modules:
