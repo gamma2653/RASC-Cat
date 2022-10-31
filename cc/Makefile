@@ -7,3 +7,6 @@ scheduler.o: scheduler.cpp
 
 tests: tests.cpp scheduler.o
 	$(CC) tests.cpp scheduler.cpp -o test
+
+clean:
+	rm -rf scheduler.o test test.exe
