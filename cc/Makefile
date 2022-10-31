@@ -1,7 +1,9 @@
-all: rasc_cat tests
+CC=g++
 
-rasc_cat: rasc_cat.cpp
-	cc rasc_cat.cpp -o rasc_cat
+all: tests
 
-tests: tests.cpp rasc_cat
-	cc tests.cpp rasc_cat.cpp -o test
+scheduler.o: scheduler.cpp
+	$(CC) -c scheduler.cpp
+
+tests: tests.cpp scheduler.o
+	$(CC) tests.cpp scheduler.cpp -o test
