@@ -4,21 +4,13 @@ from enum import IntFlag
 from queue import PriorityQueue
 from typing import Tuple
 
+from rasc_cat import scheduler, config
+
 class ConnectionType(IntFlag):
     NONE = 0b00
     HTTP = 0b01
     SOCK = 0b10
     FULL = 0b11
-
-config = {
-    'socket': {
-        'args': {
-            'family': socket.AddressFamily.AF_INET,
-            'type': socket.SOCK_STREAM
-        }
-    }
-}
-
 
 class Connection:
 
@@ -28,9 +20,9 @@ class Connection:
         self.sockets: PriorityQueue[Tuple[int, socket.socket]]
 
 
-    def enter(self):
+    def connect(self):
         if self.conn_type & ConnectionType.SOCK:
-            sock = socket.socket(**config['socket']['args'])
+            sock = socket.socket(**config.CONNECTION['socket']['args'])
             sock.connect((self.ip, self.port))
             self.sockets.put((0, sock))
         if self.conn_type & ConnectionType.HTTP:
@@ -40,15 +32,15 @@ class Connection:
             })
 
     def __enter__(self):
-        self.enter()
+        self.connect()
     
-    def exit(self):
+    def disconnect(self):
         if self.conn_type & ConnectionType.SOCK:
             for sock in self.sockets:
                 sock.close()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.exit()
+        self.disconnect()
         return self
     
     def set_http_addr(self, ip: str, port: int):
@@ -75,3 +67,5 @@ class Connection:
     '''
     def request(self, params):
         pass
+
+handler_data = scheduler.ModuleData('connection_handler', )
