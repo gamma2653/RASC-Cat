@@ -11,7 +11,7 @@ CONNECTION = {
 
 
 PERSONALITY = {
-    'chaos': 5
+    'chaos': 5.0
 }
 
 del socket

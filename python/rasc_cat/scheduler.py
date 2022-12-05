@@ -1,34 +1,25 @@
 # TODO: Reimplement in C++ or Rust(preferred)
 
 from collections import namedtuple
-from typing import Iterable, Any, MutableSequence, List
+from typing import Iterable, Any, MutableSequence, Optional
 import logging
 import subprocess
 from enum import Enum, auto as enum_auto
 import os
+from abc import ABC, abstractmethod
+from contextlib import AbstractContextManager
+
+import multiprocessing
 
 PROJECT_NAME = 'RASC_CAT'
 
-class ModuleType(Enum):
-    MODULE = enum_auto()
-    START_SCRIPT = enum_auto()
-    INTERNAL = enum_auto()
-
-class EnvType(Enum):
-    ISOLATED = enum_auto()
-    SYSTEM = enum_auto()
-    CURRENT = enum_auto()
-
-ModuleData = namedtuple('ModuleData', ('name', 'dir', 'env_type', 'mod_type', 'args', 'kwargs'))
-# Typing: (str, Optional[pathlib.Path], ModuleType, Iterable[Any], Iterable[Any])
-
 class System: # Note: Not a real scheduler, but needed a python based controller for testing.
     
-    modules: MutableSequence[ModuleData] = []
-    __internal_modules = []
-    __running_modules: List[subprocess.CompletedProcess] = []
+    modules: MutableSequence[multiprocessing.Process] = []
+    running: bool = False
 
-    def __init__(self, name=PROJECT_NAME, log_level = logging.INFO, log_file='./output.log'):
+    def __init__(self, name=PROJECT_NAME, modules: Optional[Iterable[multiprocessing.Process]] = None,
+            log_level = logging.INFO, log_file='./output.log'):
 
         ##### Logger setup #####
         formatter = logging.Formatter('[%(asctime)s] [%(name)s]: [%(levelname)s] %(message)s',
@@ -48,44 +39,22 @@ class System: # Note: Not a real scheduler, but needed a python based controller
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
         ##### End logger setup #####
+        if modules is not None:
+            self.modules.extend(modules)
+        
 
-    def add_module(self, module: ModuleData, args: Iterable[Any] = (), kwargs: Iterable[Any] = ()):
+    def add_module(self, module: multiprocessing.Process):
         self.modules.append(module)
-        if module.mod_type is ModuleType.INTERNAL:
-            self.__internal_modules.append(module)
+        
 
     def start(self):
-        for mod_name, dir, env_type, mod_type, args, kwargs in self.modules:
-            # Generate env activate command
-            windows_cmd = f'source {os.path.join(dir, "venv", "bin", "activate")}'
-            posix_cmd = f'call {os.path.join(dir, "venv", "Scripts", "activate")}'
-            
-            env_activate_cmd = windows_cmd if os.name == 'nt' else posix_cmd
-
-            # Generate module start command
-            mod_type_map = {
-                ModuleType.MODULE: f'python -m {mod_name}',
-                ModuleType.START_SCRIPT: f'python {os.path.join(dir, f"{mod_name}.py")}',
-                # ModuleType.INTERNAL: # Gotta think this one through more. Temp bad solution
-                ModuleType.INTERNAL: (
-                    f'python -c "from {dir} import {mod_name}'
-                    f'{mod_name}.start(*args, **kwargs)"')
-            }
-
-            start_cmd = mod_type_map[mod_type]
-
-            # Technically could also be 'java', but I will assume we're not running w/ Jython. :)
-            self.__running_modules.append(
-                subprocess.run(
-                    f'''{env_activate_cmd} && {start_cmd}''',
-                    
-                )
-            )
+        self.running = True
+        for module in self.modules:
+            module.run()
         
-    def stop(self):
-
-        for module in self.__running_modules:
-            module.
+    def stop(self, timeout=None):
+        for module in self.modules:
+            module.join(timeout)
 
     def __enter__(self):
         self.start()
