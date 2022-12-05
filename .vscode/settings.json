@@ -27,5 +27,6 @@
         "system_error": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }
