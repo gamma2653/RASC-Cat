@@ -1,22 +1,20 @@
 # TODO: Reimplement in C++ or Rust(preferred)
 
-from collections import namedtuple
 from typing import Iterable, Any, MutableSequence, Optional
 import logging
-import subprocess
-from enum import Enum, auto as enum_auto
 import os
-from abc import ABC, abstractmethod
-from contextlib import AbstractContextManager
-
 import multiprocessing
+import socket
 
 PROJECT_NAME = 'RASC_CAT'
+
+from rasc_cat import config
 
 class System: # Note: Not a real scheduler, but needed a python based controller for testing.
     
     modules: MutableSequence[multiprocessing.Process] = []
     running: bool = False
+    server = socket.socket(**config.Connection['socket']['args'])
 
     def __init__(self, name=PROJECT_NAME, modules: Optional[Iterable[multiprocessing.Process]] = None,
             log_level = logging.INFO, log_file='./output.log'):
@@ -50,7 +48,7 @@ class System: # Note: Not a real scheduler, but needed a python based controller
     def start(self):
         self.running = True
         for module in self.modules:
-            module.run()
+            module.start()
         
     def stop(self, timeout=None):
         for module in self.modules:

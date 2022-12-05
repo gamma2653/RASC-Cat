@@ -2,6 +2,7 @@ import socket
 
 CONNECTION = {
     'socket': {
+        'host': ('localhost',26656),
         'args': {
             'family': socket.AddressFamily.AF_INET,
             'type': socket.SOCK_STREAM
