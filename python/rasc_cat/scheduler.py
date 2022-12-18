@@ -7,7 +7,7 @@ import subprocess
 from enum import Enum, auto as enum_auto
 import os
 
-PROJECT_NAME = 'RASC_CAT'
+from rasc_cat import config
 
 class ModuleType(Enum):
     MODULE = enum_auto()
@@ -18,14 +18,14 @@ class EnvType(Enum):
     SYSTEM = enum_auto()
     CURRENT = enum_auto()
 
-ModuleData = namedtuple('ModuleData', ('name', 'path', 'env_type', 'mod_type', 'args', 'kwargs'))
-# Typing: (str, Optional[pathlib.Path], ModuleType, Iterable[Any], Iterable[Any])
+ModuleData = namedtuple('ModuleData', ('module_name', 'path', 'env_type', 'mod_type', 'args'))
+#                          Typing: (str, Optional[pathlib.Path], EnvType, ModuleType, Iterable[Any])
 
 class System: # Note: Not a real scheduler, but needed a python based controller for testing.
     
     modules: MutableSequence[ModuleData] = []
 
-    def __init__(self, name=PROJECT_NAME, log_level = logging.INFO, log_file='./output.log'):
+    def __init__(self, name=config.PROJECT_NAME, log_level = logging.INFO, log_file='./output.log'):
 
         # Logger setup
         formatter = logging.Formatter('[%(asctime)s] [%(name)s]: [%(levelname)s] %(message)s',

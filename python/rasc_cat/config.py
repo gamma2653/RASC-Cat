@@ -1,0 +1,7 @@
+DEFAULT_CHAOS = 10.0
+
+DEFAULT_MODULES = [
+    
+]
+
+PROJECT_NAME = 'rasc_cat'
